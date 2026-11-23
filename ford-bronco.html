@@ -187,19 +187,6 @@ footer a:hover{color:var(--gold-2)}
 .foot-bottom{border-top:1px solid #2a2822;padding:20px 0;display:flex;gap:18px;align-items:center;flex-wrap:wrap;font-size:.86rem}
 .pay-badges{display:flex;gap:8px;margin-left:auto}
 .pay-badges span{border:1px solid #3a372c;border-radius:6px;padding:5px 10px;font-size:.7rem;font-weight:800;letter-spacing:.06em;color:#fff}
-/* modal */
-.modal-bk{position:fixed;inset:0;background:rgba(5,5,5,.62);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
-.modal-bk.open{display:flex}
-.modal{background:#fff;border-radius:16px;max-width:430px;width:100%;padding:28px;max-height:90vh;overflow:auto;color:var(--ink)}
-.modal .tabs{display:flex;gap:8px;margin-bottom:18px}
-.modal .tabs .btn{flex:1}
-.field label{display:block;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-bottom:7px}
-.field input{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 12px;font:500 .95rem 'Archivo',sans-serif;background:#fff;color:var(--ink)}
-.field input:focus{outline:2px solid var(--gold-soft);border-color:var(--gold)}
-.ok-box{background:var(--gold-soft);border-radius:10px;padding:14px 16px;font-size:.93rem;line-height:1.55;color:#5c4712}
-.hidden{display:none!important}
-.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(90px);background:var(--black);color:#fff;padding:13px 20px;border-radius:10px;font-weight:600;font-size:.92rem;z-index:120;transition:transform .25s;max-width:92vw;text-align:center}
-.toast.show{transform:translateX(-50%) translateY(0)}
 @media (max-width:1020px){
   .detail-grid{grid-template-columns:1fr;grid-template-areas:"gallery" "pricing" "specs" "calendar"}
   .price-panel{position:static;margin-top:22px}
@@ -210,7 +197,6 @@ footer a:hover{color:var(--gold-2)}
 }
 @media (max-width:760px){
   nav.main{display:none}
-  .top-actions .btn-ghost{display:none}
   .burger{display:block}
   .top-actions{margin-left:0}
   .spec-grid{grid-template-columns:1fr 1fr}
@@ -238,8 +224,6 @@ footer a:hover{color:var(--gold-2)}
       <a href="contact.html">Contact</a>
     </nav>
     <div class="top-actions">
-      <button class="btn btn-ghost" id="signInBtn" type="button">Sign In</button>
-      <button class="btn btn-gold" id="registerBtn" type="button">Register</button>
       <button class="burger" id="burgerBtn" type="button" aria-label="Open menu" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
       </button>
@@ -251,7 +235,6 @@ footer a:hover{color:var(--gold-2)}
     <a href="services.html">Services</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
-    <a href="#" id="mobileSignIn">Sign In / Register</a>
   </div>
 </header>
 
@@ -517,39 +500,6 @@ footer a:hover{color:var(--gold-2)}
   </div>
 </footer>
 
-<!-- Sign in / Register modal -->
-<div class="modal-bk" id="authModal">
-  <div class="modal" role="dialog" aria-modal="true" aria-label="Client account">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3 style="font-size:1.3rem">Client Account</h3>
-      <button class="btn btn-ghost" id="authClose" type="button" style="padding:8px 14px" aria-label="Close">&#10005;</button>
-    </div>
-    <div class="tabs" style="margin-top:16px">
-      <button class="btn btn-dark" id="tabSignIn" type="button">Sign In</button>
-      <button class="btn btn-ghost" id="tabRegister" type="button">Register</button>
-    </div>
-    <form id="authForm" novalidate>
-      <div class="field hidden" id="authNameField" style="margin-bottom:14px">
-        <label for="authName">Full name</label>
-        <input id="authName" type="text" autocomplete="name" placeholder="Your full name" />
-      </div>
-      <div class="field" style="margin-bottom:14px">
-        <label for="authEmail">Email</label>
-        <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" />
-      </div>
-      <div class="field" style="margin-bottom:14px">
-        <label for="authPass">Password</label>
-        <input id="authPass" type="password" autocomplete="current-password" placeholder="Your password" />
-      </div>
-      <div class="ok-box hidden" id="authMsg" style="margin-bottom:14px"></div>
-      <button class="btn btn-gold" type="submit" id="authSubmit" style="width:100%">Sign In</button>
-      <p style="color:var(--mut);font-size:.86rem;line-height:1.55;margin:14px 0 0">Client accounts are confirmed personally by our concierge team. New here? Register and we will email you to complete your account before your first booking.</p>
-    </form>
-  </div>
-</div>
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-
 <script>
 (function(){
   // Mobile nav
@@ -642,53 +592,6 @@ footer a:hover{color:var(--gold-2)}
     });
   });
   renderSum();
-
-  // Auth modal
-  var modal=document.getElementById('authModal');
-  var mode='signin';
-  var tabIn=document.getElementById('tabSignIn');
-  var tabReg=document.getElementById('tabRegister');
-  var nameField=document.getElementById('authNameField');
-  var submit=document.getElementById('authSubmit');
-  var msg=document.getElementById('authMsg');
-  function setMode(m){
-    mode=m;
-    var reg=(m==='register');
-    nameField.classList.toggle('hidden', !reg);
-    submit.textContent=reg?'Create Account':'Sign In';
-    tabIn.className='btn '+(reg?'btn-ghost':'btn-dark');
-    tabReg.className='btn '+(reg?'btn-dark':'btn-ghost');
-    msg.classList.add('hidden');
-  }
-  function openModal(m){ setMode(m||'signin'); modal.classList.add('open'); }
-  function closeModal(){ modal.classList.remove('open'); }
-  document.getElementById('signInBtn').addEventListener('click',function(){ openModal('signin'); });
-  document.getElementById('registerBtn').addEventListener('click',function(){ openModal('register'); });
-  var msi=document.getElementById('mobileSignIn');
-  msi.addEventListener('click',function(e){ e.preventDefault(); mnav.classList.remove('open'); openModal('signin'); });
-  document.getElementById('authClose').addEventListener('click', closeModal);
-  modal.addEventListener('click',function(e){ if(e.target===modal) closeModal(); });
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal(); });
-  tabIn.addEventListener('click',function(){ setMode('signin'); });
-  tabReg.addEventListener('click',function(){ setMode('register'); });
-
-  var toastEl=document.getElementById('toast');
-  function toast(t){ toastEl.textContent=t; toastEl.classList.add('show'); setTimeout(function(){ toastEl.classList.remove('show'); },3600); }
-
-  document.getElementById('authForm').addEventListener('submit',function(e){
-    e.preventDefault();
-    var email=document.getElementById('authEmail').value.trim();
-    var pass=document.getElementById('authPass').value;
-    var name=document.getElementById('authName').value.trim();
-    if(mode==='register' && !name){ msg.textContent='Please enter your full name so our concierge team can welcome you properly.'; msg.classList.remove('hidden'); return; }
-    if(!email || email.indexOf('@')<0){ msg.textContent='Please enter a valid email address.'; msg.classList.remove('hidden'); return; }
-    if(!pass){ msg.textContent='Please enter your password.'; msg.classList.remove('hidden'); return; }
-    msg.textContent = mode==='register'
-      ? 'Thank you, '+name+'. Your registration has been received — our concierge team will email '+email+' to complete your account before your first booking.'
-      : 'Welcome back. Our concierge team is confirming your account for '+email+' — you will receive an email shortly to continue.';
-    msg.classList.remove('hidden');
-    toast(mode==='register' ? 'Registration received — check your email to continue.' : 'Sign-in received — check your email to continue.');
-  });
 })();
 </script>
 </body>

@@ -54,8 +54,6 @@
   .mobile-menu.open{display:block}
   .mobile-menu a{display:block;padding:13px 4px;text-decoration:none;font-weight:600;border-bottom:1px solid var(--grey);min-height:44px}
   .mobile-menu a.active{color:var(--gold)}
-  .mobile-menu .row{display:flex;gap:10px;margin-top:14px}
-  .mobile-menu .row .btn{flex:1}
 
   /* ---------- Banner ---------- */
   .banner{background:var(--black);color:#fff;text-align:center;padding:88px 24px 96px;position:relative;overflow:hidden}
@@ -140,29 +138,10 @@
   .foot li span{color:#c9c2b2;display:inline-block;padding:5px 0}
   .legal{border-top:1px solid #262626;padding:22px 0;display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:space-between;color:#8d8574;font-size:.88rem}
 
-  /* ---------- Modal ---------- */
-  .modal-back{position:fixed;inset:0;background:rgba(8,8,8,.62);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}
-  .modal-back.open{display:flex}
-  .modal{background:#fff;border-radius:18px;max-width:430px;width:100%;padding:34px 32px 30px;position:relative;box-shadow:0 30px 70px rgba(0,0,0,.35)}
-  .modal .x{position:absolute;top:12px;right:12px;width:40px;height:40px;border:none;background:var(--grey);border-radius:50%;font-size:1.05rem;cursor:pointer}
-  .modal h2{margin:0 0 6px;font-size:1.5rem}
-  .modal p.sub{margin:0 0 22px;color:var(--mut);font-size:.95rem;line-height:1.55}
-  .tabs{display:flex;background:var(--grey);border-radius:10px;padding:4px;margin-bottom:22px}
-  .tabs button{flex:1;border:none;background:transparent;border-radius:8px;font-weight:700;cursor:pointer;padding:9px;font-family:inherit;font-size:.95rem}
-  .tabs button.on{background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.12);color:var(--gold)}
-  .field{margin-bottom:14px}
-  .field label{display:block;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:7px}
-  .field input{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 13px;font:inherit;font-size:.98rem}
-  .field input:focus{outline:2px solid var(--gold-soft);border-color:var(--gold)}
-  .modal .btn{width:100%;margin-top:6px}
-  .modal .note{margin:16px 0 0;text-align:center;color:var(--mut);font-size:.88rem;line-height:1.55}
-  .form-msg{display:none;background:var(--gold-soft);border:1px solid var(--gold);color:#6d5516;border-radius:9px;padding:11px 13px;font-size:.92rem;margin-bottom:14px;line-height:1.5}
-  .form-msg.show{display:block}
-
   @media (max-width:1020px){
     nav.main{display:none}
     .burger{display:block}
-    .bar-actions .lang,.bar-actions .btn-ghost{display:none}
+    .bar-actions .lang{display:none}
     .foot{grid-template-columns:1fr 1fr}
   }
   @media (max-width:760px){
@@ -192,8 +171,6 @@
     </nav>
     <div class="bar-actions">
       <button class="lang" type="button" aria-label="Language: English">EN ▾</button>
-      <button class="btn btn-ghost" type="button" data-auth="signin">Sign In</button>
-      <button class="btn btn-gold" type="button" data-auth="register">Register</button>
       <button class="burger" type="button" id="burger" aria-label="Open menu" aria-expanded="false">☰</button>
     </div>
   </div>
@@ -203,10 +180,6 @@
     <a href="services.html">Services</a>
     <a href="about.html" class="active" aria-current="page">About</a>
     <a href="contact.html">Contact</a>
-    <div class="row">
-      <button class="btn btn-ghost" type="button" data-auth="signin">Sign In</button>
-      <button class="btn btn-gold" type="button" data-auth="register">Register</button>
-    </div>
   </div>
 </header>
 
@@ -412,36 +385,6 @@
   </div>
 </footer>
 
-<!-- Auth modal -->
-<div class="modal-back" id="authBack" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-  <div class="modal">
-    <button class="x" type="button" id="authClose" aria-label="Close">✕</button>
-    <h2 id="authTitle" class="display">Welcome back</h2>
-    <p class="sub" id="authSub">Sign in to manage your reservations and preferences.</p>
-    <div class="tabs" role="tablist">
-      <button type="button" id="tabSignin" class="on">Sign In</button>
-      <button type="button" id="tabRegister">Register</button>
-    </div>
-    <div class="form-msg" id="authMsg"></div>
-    <form id="authForm" novalidate>
-      <div class="field" id="nameField" style="display:none">
-        <label for="authName">Full name</label>
-        <input id="authName" type="text" autocomplete="name" placeholder="Your name" />
-      </div>
-      <div class="field">
-        <label for="authEmail">Email address</label>
-        <input id="authEmail" type="email" autocomplete="email" placeholder="email@example.com" required />
-      </div>
-      <div class="field">
-        <label for="authPass">Password</label>
-        <input id="authPass" type="password" autocomplete="current-password" placeholder="Your password" required />
-      </div>
-      <button class="btn btn-gold" type="submit" id="authSubmit">Sign In</button>
-    </form>
-    <p class="note">Client accounts are connected when the full website launches. For reservations today, our concierge team is happy to assist at <a href="mailto:concierge@modluxury.com" style="color:var(--gold);font-weight:600">concierge@modluxury.com</a>.</p>
-  </div>
-</div>
-
 <script>
   // Mobile menu
   var burger = document.getElementById('burger');
@@ -452,65 +395,6 @@
     burger.textContent = open ? '✕' : '☰';
   });
 
-  // Auth modal
-  var back = document.getElementById('authBack');
-  var title = document.getElementById('authTitle');
-  var sub = document.getElementById('authSub');
-  var tabIn = document.getElementById('tabSignin');
-  var tabReg = document.getElementById('tabRegister');
-  var nameField = document.getElementById('nameField');
-  var submit = document.getElementById('authSubmit');
-  var msg = document.getElementById('authMsg');
-  var mode = 'signin';
-
-  function setMode(m) {
-    mode = m;
-    var reg = m === 'register';
-    tabIn.classList.toggle('on', !reg);
-    tabReg.classList.toggle('on', reg);
-    nameField.style.display = reg ? 'block' : 'none';
-    title.textContent = reg ? 'Create your account' : 'Welcome back';
-    sub.textContent = reg
-      ? 'Register for faster reservations and a service tailored to you.'
-      : 'Sign in to manage your reservations and preferences.';
-    submit.textContent = reg ? 'Register' : 'Sign In';
-    msg.classList.remove('show');
-  }
-  function openAuth(m) { setMode(m); back.classList.add('open'); }
-  function closeAuth() { back.classList.remove('open'); }
-
-  var triggers = document.querySelectorAll('[data-auth]');
-  for (var i = 0; i < triggers.length; i++) {
-    triggers[i].addEventListener('click', function () {
-      openAuth(this.getAttribute('data-auth'));
-      menu.classList.remove('open');
-    });
-  }
-  tabIn.addEventListener('click', function () { setMode('signin'); });
-  tabReg.addEventListener('click', function () { setMode('register'); });
-  document.getElementById('authClose').addEventListener('click', closeAuth);
-  back.addEventListener('click', function (e) { if (e.target === back) closeAuth(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAuth(); });
-
-  document.getElementById('authForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var email = document.getElementById('authEmail').value.trim();
-    var pass = document.getElementById('authPass').value;
-    if (!email || email.indexOf('@') < 0) {
-      msg.textContent = 'Please enter a valid email address.';
-      msg.classList.add('show');
-      return;
-    }
-    if (pass.length < 6) {
-      msg.textContent = 'Your password must be at least 6 characters.';
-      msg.classList.add('show');
-      return;
-    }
-    msg.textContent = mode === 'register'
-      ? 'Thank you — client registration opens when the full website launches. Our concierge team can assist you today at concierge@modluxury.com.'
-      : 'Client sign-in opens when the full website launches. For assistance today, please contact concierge@modluxury.com.';
-    msg.classList.add('show');
-  });
 </script>
 </body>
 </html>
