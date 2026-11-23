@@ -322,24 +322,19 @@ footer a:hover{color:var(--gold-2)}
       </div>
     </div>
 
-    <!-- TEMPLATE 5: Availability calendar — November 2026, tappable pickup / return -->
+    <!-- TEMPLATE 5: Availability calendar — real current month, tappable pickup / return -->
     <div class="detail-calendar">
       <div class="card">
-        <h2>Availability — November 2026</h2>
+        <h2 id="calTitle">Availability</h2>
         <div class="cal">
           <div class="cal-head"><b>Tap your pickup day, then your return day</b><span>Availability is confirmed personally for every reservation.</span></div>
-          <div class="cal-grid" role="group" aria-label="November 2026 availability calendar — tap a pickup day, then a return day">
+          <div class="cal-grid" id="calGrid" role="group" aria-label="Availability calendar — tap a pickup day, then a return day">
             <div class="dow">Sun</div><div class="dow">Mon</div><div class="dow">Tue</div><div class="dow">Wed</div><div class="dow">Thu</div><div class="dow">Fri</div><div class="dow">Sat</div>
-            <div class="day past" aria-disabled="true">1</div><div class="day past" aria-disabled="true">2</div><div class="day past" aria-disabled="true">3</div><div class="day past" aria-disabled="true">4</div><div class="day past" aria-disabled="true">5</div><div class="day past" aria-disabled="true">6</div><div class="day past" aria-disabled="true">7</div>
-            <div class="day past" aria-disabled="true">8</div><div class="day past" aria-disabled="true">9</div><div class="day past" aria-disabled="true">10</div><div class="day past" aria-disabled="true">11</div><div class="day past" aria-disabled="true">12</div><div class="day past" aria-disabled="true">13</div><div class="day past" aria-disabled="true">14</div>
-            <div class="day past" aria-disabled="true">15</div><button class="day today" type="button" data-day="16" aria-current="date" aria-label="Pickup or return: Monday, November 16, 2026 — today">16</button><button class="day" type="button" data-day="17" aria-label="Pickup or return: Tuesday, November 17, 2026">17</button><button class="day" type="button" data-day="18" aria-label="Pickup or return: Wednesday, November 18, 2026">18</button><button class="day" type="button" data-day="19" aria-label="Pickup or return: Thursday, November 19, 2026">19</button><button class="day" type="button" data-day="20" aria-label="Pickup or return: Friday, November 20, 2026">20</button><button class="day" type="button" data-day="21" aria-label="Pickup or return: Saturday, November 21, 2026">21</button>
-            <button class="day" type="button" data-day="22" aria-label="Pickup or return: Sunday, November 22, 2026">22</button><button class="day" type="button" data-day="23" aria-label="Pickup or return: Monday, November 23, 2026">23</button><button class="day" type="button" data-day="24" aria-label="Pickup or return: Tuesday, November 24, 2026">24</button><button class="day" type="button" data-day="25" aria-label="Pickup or return: Wednesday, November 25, 2026">25</button><button class="day" type="button" data-day="26" aria-label="Pickup or return: Thursday, November 26, 2026">26</button><button class="day" type="button" data-day="27" aria-label="Pickup or return: Friday, November 27, 2026">27</button><button class="day" type="button" data-day="28" aria-label="Pickup or return: Saturday, November 28, 2026">28</button>
-            <button class="day" type="button" data-day="29" aria-label="Pickup or return: Sunday, November 29, 2026">29</button><button class="day" type="button" data-day="30" aria-label="Pickup or return: Monday, November 30, 2026">30</button><div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day empty"></div><div class="day empty"></div>
           </div>
           <div class="cal-pick" id="calPick" aria-live="polite"><b>No dates picked yet.</b> Tap a day for pickup, then tap a later day for return. Tap again to start over.</div>
           <div class="cal-legend">
             <span><i style="background:var(--grey);border:1px solid var(--line)"></i>Available to request</span>
-            <span><i style="background:#fdf9ee;border:2px solid var(--gold)"></i>Today — Mon, Nov 16, 2026</span>
+            <span><i style="background:#fdf9ee;border:2px solid var(--gold)"></i><span id="todayLabel">Today</span></span>
             <span><i style="background:var(--gold)"></i>Your picked days</span>
           </div>
         </div>
@@ -573,37 +568,95 @@ footer a:hover{color:var(--gold-2)}
     if(e.key==='ArrowRight'){ e.preventDefault(); show(gi+1); }
   });
 
-  // Availability calendar — tappable pickup / return (November 2026, same on every car page)
-  var calBtns=Array.prototype.slice.call(document.querySelectorAll('.cal-grid button.day'));
+  // Availability calendar — real current month, tappable pickup / return.
+  // Opens on the visitor's own current month; days before today are struck through and cannot be picked.
+  var RATES={daily:120, weekend:349, weekly:695, monthly:2400};
+  var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var MON_S=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var DOW_S=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var DOW_L=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var nowD=new Date();
+  var todayD=new Date(nowD.getFullYear(), nowD.getMonth(), nowD.getDate());
+  var calYear=todayD.getFullYear(), calMonth=todayD.getMonth();
+  var calGrid=document.getElementById('calGrid');
   var calPick=document.getElementById('calPick');
   var pickStart=null, pickEnd=null;
-  var dayNames={16:'Mon, Nov 16, 2026',17:'Tue, Nov 17, 2026',18:'Wed, Nov 18, 2026',19:'Thu, Nov 19, 2026',20:'Fri, Nov 20, 2026',21:'Sat, Nov 21, 2026',22:'Sun, Nov 22, 2026',23:'Mon, Nov 23, 2026',24:'Tue, Nov 24, 2026',25:'Wed, Nov 25, 2026',26:'Thu, Nov 26, 2026',27:'Fri, Nov 27, 2026',28:'Sat, Nov 28, 2026',29:'Sun, Nov 29, 2026',30:'Mon, Nov 30, 2026'};
+  var dateQuote=null;
+  var onDatesChanged=null;
+  var dayBtns={};
+  function fmtShort(d){ return DOW_S[d.getDay()]+', '+MON_S[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
+  function fmtLong(d){ return DOW_L[d.getDay()]+', '+MONTHS[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
+  // Rental total for a rental length, from this car's four rates:
+  // 1-2 days daily x days; exactly 3 days the weekend rate; 4-6 days daily x days;
+  // 7+ days the weekly rate per full 7 days plus daily for the remaining days; 30 days the monthly rate.
+  function priceForDays(days){
+    if(days===30) return RATES.monthly;
+    if(days===3) return RATES.weekend;
+    if(days>=7) return Math.floor(days/7)*RATES.weekly+(days%7)*RATES.daily;
+    return RATES.daily*days;
+  }
+  document.getElementById('calTitle').textContent='Availability \u2014 '+MONTHS[calMonth]+' '+calYear;
+  document.getElementById('todayLabel').textContent='Today \u2014 '+fmtShort(todayD);
+  calGrid.setAttribute('aria-label', MONTHS[calMonth]+' '+calYear+' availability calendar \u2014 tap a pickup day, then a return day');
+  (function buildCal(){
+    var lead=new Date(calYear,calMonth,1).getDay();
+    var daysIn=new Date(calYear,calMonth+1,0).getDate();
+    var i, cell;
+    for(i=0;i<lead;i++){ cell=document.createElement('div'); cell.className='day empty'; calGrid.appendChild(cell); }
+    for(var dnum=1; dnum<=daysIn; dnum++){
+      var dt=new Date(calYear,calMonth,dnum);
+      if(dt<todayD){
+        cell=document.createElement('div');
+        cell.className='day past';
+        cell.setAttribute('aria-disabled','true');
+        cell.textContent=dnum;
+        calGrid.appendChild(cell);
+      } else {
+        var b=document.createElement('button');
+        b.type='button';
+        b.className='day'+(dt.getTime()===todayD.getTime()?' today':'');
+        b.textContent=dnum;
+        b.setAttribute('data-time', String(dt.getTime()));
+        b.setAttribute('aria-label','Pickup or return: '+fmtLong(dt)+(dt.getTime()===todayD.getTime()?' \u2014 today':''));
+        if(dt.getTime()===todayD.getTime()) b.setAttribute('aria-current','date');
+        b.addEventListener('click', onDayTap);
+        calGrid.appendChild(b);
+        dayBtns[dt.getTime()]=b;
+      }
+    }
+    var tail=(7-((lead+daysIn)%7))%7;
+    for(i=0;i<tail;i++){ cell=document.createElement('div'); cell.className='day empty'; calGrid.appendChild(cell); }
+  })();
+  function onDayTap(){
+    var d=new Date(parseInt(this.getAttribute('data-time'),10));
+    if(pickStart===null || (pickStart!==null && pickEnd!==null)){ pickStart=d; pickEnd=null; }
+    else if(d.getTime()===pickStart.getTime()){ pickEnd=d; }
+    else if(d>pickStart){ pickEnd=d; }
+    else { pickStart=d; pickEnd=null; }
+    renderCal();
+  }
   function renderCal(){
-    calBtns.forEach(function(b){
-      var d=parseInt(b.getAttribute('data-day'),10);
-      b.classList.toggle('selected', d===pickStart || d===pickEnd);
-      b.classList.toggle('in-range', !!(pickStart!==null && pickEnd!==null && d>pickStart && d<pickEnd));
-      b.setAttribute('aria-pressed', (d===pickStart || d===pickEnd) ? 'true' : 'false');
+    Object.keys(dayBtns).forEach(function(k){
+      var b=dayBtns[k], t=parseInt(k,10);
+      var sel=!!(pickStart && (t===pickStart.getTime() || (pickEnd && t===pickEnd.getTime())));
+      b.classList.toggle('selected', sel);
+      b.classList.toggle('in-range', !!(pickStart && pickEnd && t>pickStart.getTime() && t<pickEnd.getTime()));
+      b.setAttribute('aria-pressed', sel?'true':'false');
     });
     if(pickStart===null){
+      dateQuote=null;
       calPick.innerHTML='<b>No dates picked yet.</b> Tap a day for pickup, then tap a later day for return. Tap again to start over.';
     } else if(pickEnd===null){
-      calPick.innerHTML='<b>Pickup:</b> '+dayNames[pickStart]+'. Now tap your return day.';
+      dateQuote=null;
+      calPick.innerHTML='<b>Pickup:</b> '+fmtShort(pickStart)+'. Now tap your return day.';
     } else {
-      var n=pickEnd-pickStart;
-      calPick.innerHTML='<b>Pickup:</b> '+dayNames[pickStart]+' &nbsp;·&nbsp; <b>Return:</b> '+dayNames[pickEnd]+' &nbsp;·&nbsp; <b>'+n+(n===1?' day':' days')+'</b>. Tap any day to start over, then continue to Book This Car to confirm.';
+      var n=Math.round((pickEnd.getTime()-pickStart.getTime())/86400000);
+      var days=Math.max(n,1);
+      dateQuote={days:days, total:priceForDays(days)};
+      calPick.innerHTML='<b>Pickup:</b> '+fmtShort(pickStart)+' &nbsp;\u00b7&nbsp; <b>Return:</b> '+fmtShort(pickEnd)+' &nbsp;\u00b7&nbsp; <b>'+n+(n===1?' day':' days')+'</b>. Tap any day to start over, then continue to Book This Car to confirm.';
     }
+    if(onDatesChanged) onDatesChanged();
   }
-  calBtns.forEach(function(b){
-    b.addEventListener('click',function(){
-      var d=parseInt(b.getAttribute('data-day'),10);
-      if(pickStart===null || (pickStart!==null && pickEnd!==null)){ pickStart=d; pickEnd=null; }
-      else if(d===pickStart){ pickEnd=d; }
-      else if(d>pickStart){ pickEnd=d; }
-      else { pickStart=d; pickEnd=null; }
-      renderCal();
-    });
-  });
   renderCal();
 
   // Pricing selection
@@ -615,7 +668,7 @@ footer a:hover{color:var(--gold-2)}
   var curPick='Self Pickup';
   var curFee=0;
   function renderSum(){
-    var total=curRate.price+curFee;
+    var total=(dateQuote?dateQuote.total:curRate.price)+curFee;
     var dep=Math.round(total*0.30*100)/100;
     document.getElementById('sumTotal').textContent=money(total);
     document.getElementById('sumDeposit').textContent=money(dep);
@@ -626,6 +679,7 @@ footer a:hover{color:var(--gold-2)}
       rateBtns.forEach(function(x){ x.classList.remove('sel'); x.setAttribute('aria-checked','false'); });
       b.classList.add('sel'); b.setAttribute('aria-checked','true');
       curRate={name:b.getAttribute('data-rate'), price:parseFloat(b.getAttribute('data-price'))};
+      if(pickStart!==null){ pickStart=null; pickEnd=null; renderCal(); }
       renderSum();
     });
   });
@@ -638,6 +692,7 @@ footer a:hover{color:var(--gold-2)}
       renderSum();
     });
   });
+  onDatesChanged=renderSum;
   renderSum();
 
 })();
